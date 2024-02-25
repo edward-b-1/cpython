@@ -348,6 +348,63 @@ builtin_all(PyObject *module, PyObject *iterable)
 }
 
 /*[clinic input]
+all_equal as builtin_all_equal
+
+    iterable: object
+    /
+
+Return True if x in the iterable are equal.
+
+If the iterable is empty, return True.
+[clinic start generated code]*/
+
+static PyObject *
+builtin_all_equal(PyObject *module, PyObject *iterable)
+/*[clinic end generated code: output=ca2a7127276f79b3 input=1a7c5d1bc3438a21]*/
+{
+    PyObject *it, *item, *prev_item;
+    PyObject *(*iternext)(PyObject *);
+    int cmp;
+
+    it = PyObject_GetIter(iterable);
+    if (it == NULL)
+        return NULL;
+    iternext = *Py_TYPE(it)->tp_iternext;
+
+    prev_item = iternext(it);
+    if (prev_item == NULL)
+        break;
+
+    for (;;) {
+        item = iternext(it);
+        if (item == NULL)
+            break;
+        cmp = PyObject_IsEqual(item, prev_item);
+        Py_DECREF(prev_item);
+        prev_item = item;
+        if (cmp < 0) {
+            Py_DECREF(prev_item);
+            Py_DECREF(it);
+            return NULL;
+        }
+        if (cmp == 0) {
+            Py_DECREF(prev_item);
+            Py_DECREF(it);
+            Py_RETURN_FALSE;
+        }
+    }
+    Py_DECREF(it);
+    Py_DECREF(prev_item);
+    if (PyErr_Occurred()) {
+        if (PyErr_ExceptionMatches(PyExc_StopIteration))
+            PyErr_Clear();
+        else
+            return NULL;
+    }
+    Py_RETURN_TRUE;
+}
+
+/*[clinic input]
 any as builtin_any
 
     iterable: object
