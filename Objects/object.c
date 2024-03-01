@@ -1835,7 +1835,7 @@ PyObject_IsTrue(PyObject *v)
         res = (*Py_TYPE(v)->tp_as_sequence->sq_length)(v);
     else
         return 1;
-    /* if it is negative, it should be either -1 or -2 */
+    /* if `res` is negative, it should be either -1 or -2 */
     return (res > 0) ? 1 : Py_SAFE_DOWNCAST(res, Py_ssize_t, int);
 }
 
@@ -1851,6 +1851,23 @@ PyObject_Not(PyObject *v)
         return res;
     return res == 0;
 }
+
+/* Test whether two objects are equal */
+
+int PyObject_IsEqual(PyObject *self, PyObject *other)
+{
+    PyObject* res = _Py_BaseObject_RichCompare(self, other, Py_EQ);
+
+    if (res == Py_True)
+        return 1;
+    else if (res == Py_False)
+        return 0;
+    else if (res == Py_NotImplemented)
+        return 0;
+    else
+        return 0;
+}
+
 
 /* Test whether an object can be called */
 
