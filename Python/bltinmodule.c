@@ -357,10 +357,9 @@ Return True if x in the iterable are equal.
 
 If the iterable is empty, return True.
 [clinic start generated code]*/
-
+/*[clinic end generated code: output= input=]*/
 static PyObject *
 builtin_all_equal(PyObject *module, PyObject *iterable)
-/*[clinic end generated code: output=ca2a7127276f79b3 input=1a7c5d1bc3438a21]*/
 {
     PyObject *it, *item, *prev_item;
     PyObject *(*iternext)(PyObject *);
@@ -372,8 +371,9 @@ builtin_all_equal(PyObject *module, PyObject *iterable)
     iternext = *Py_TYPE(it)->tp_iternext;
 
     prev_item = iternext(it);
-    if (prev_item == NULL)
-        break;
+    if (prev_item == NULL) {
+        Py_RETURN_TRUE;
+    }
 
     for (;;) {
         item = iternext(it);
@@ -382,19 +382,20 @@ builtin_all_equal(PyObject *module, PyObject *iterable)
         cmp = PyObject_IsEqual(item, prev_item);
         Py_DECREF(prev_item);
         prev_item = item;
+        // optimized out: item = NULL
         if (cmp < 0) {
-            Py_DECREF(prev_item);
+            Py_DECREF(item);
             Py_DECREF(it);
             return NULL;
         }
         if (cmp == 0) {
-            Py_DECREF(prev_item);
+            Py_DECREF(item);
             Py_DECREF(it);
             Py_RETURN_FALSE;
         }
     }
-    Py_DECREF(it);
     Py_DECREF(prev_item);
+    Py_DECREF(it);
     if (PyErr_Occurred()) {
         if (PyErr_ExceptionMatches(PyExc_StopIteration))
             PyErr_Clear();
