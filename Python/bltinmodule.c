@@ -347,17 +347,6 @@ builtin_all(PyObject *module, PyObject *iterable)
     Py_RETURN_TRUE;
 }
 
-/*[clinic input]
-all_equal as builtin_all_equal
-
-    iterable: object
-    /
-
-Return True if x in the iterable are equal.
-
-If the iterable is empty, return True.
-[clinic start generated code]*/
-/*[clinic end generated code: output= input=]*/
 static PyObject *
 builtin_all_equal(PyObject *module, PyObject *iterable)
 {
