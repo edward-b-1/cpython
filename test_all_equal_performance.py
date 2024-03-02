@@ -69,3 +69,31 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+'''debug build
+None 912.4 ms  baseline
+False 833.9 ms  all_equal
+False 1229.8 ms  itertools_all_equal_1
+False 1264.8 ms  itertools_all_equal_2
+
+None 1097.5 ms  baseline
+False 850.6 ms  all_equal
+False 1207.6 ms  itertools_all_equal_1
+False 1210.2 ms  itertools_all_equal_2
+
+None 1059.9 ms  baseline
+False 838.3 ms  all_equal
+False 1220.5 ms  itertools_all_equal_1
+False 1238.5 ms  itertools_all_equal_2
+
+None 1066.1 ms  baseline
+False 858.0 ms  all_equal
+False 1230.9 ms  itertools_all_equal_1
+False 1215.4 ms  itertools_all_equal_2
+
+None 1065.1 ms  baseline
+False 840.4 ms  all_equal
+False 1252.0 ms  itertools_all_equal_1
+False 1240.2 ms  itertools_all_equal_2
+'''
