@@ -355,42 +355,54 @@ builtin_all_equal(PyObject *module, PyObject *iterable)
     int cmp;
 
     it = PyObject_GetIter(iterable);
-    if (it == NULL)
+    if (it == NULL) {
         return NULL;
+    }
     iternext = *Py_TYPE(it)->tp_iternext;
 
     prev_item = iternext(it);
     if (prev_item == NULL) {
+        Py_DECREF(it);
         Py_RETURN_TRUE;
     }
 
     for (;;) {
         item = iternext(it);
-        if (item == NULL)
+        if (item == NULL) {
             break;
-        cmp = PyObject_IsEqual(item, prev_item);
-        Py_DECREF(prev_item);
-        prev_item = item;
-        // optimized out: item = NULL
+        }
+
+        cmp = PyObject_RichCompareBool(item, prev_item, Py_EQ);
+
         if (cmp < 0) {
+            Py_DECREF(prev_item);
             Py_DECREF(item);
             Py_DECREF(it);
             return NULL;
         }
-        if (cmp == 0) {
+        else if (cmp == 0) {
+            Py_DECREF(prev_item);
             Py_DECREF(item);
             Py_DECREF(it);
             Py_RETURN_FALSE;
         }
+
+        Py_DECREF(prev_item);
+        prev_item = item;
+        // optimized out: item = NULL
     }
+    // if this loop exits, then item = NULL
+
     Py_DECREF(prev_item);
     Py_DECREF(it);
+
     if (PyErr_Occurred()) {
         if (PyErr_ExceptionMatches(PyExc_StopIteration))
             PyErr_Clear();
         else
             return NULL;
     }
+
     Py_RETURN_TRUE;
 }
 
